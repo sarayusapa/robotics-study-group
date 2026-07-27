@@ -1,10 +1,10 @@
-# Week 08 — World Models: Full Study Notes
+# World Models: Full Study Notes
 
 # Part 1 — Why world models at all
 
-### 1.1 The batter (slide 10)
+### 1.1 The batter
 
-A 160 km/h fastball covers the 18.4 m from mound to plate in about 400 ms. Human visual processing from retina to conscious percept is roughly 150–250 ms; a swing takes about 150 ms to initiate and execute. The budget does not close. Batters do not react to the ball — they **predict** it from the pitcher's kinematics and the first few tens of milliseconds of flight, and commit to a swing before the visual evidence arrives.
+Batters do not react to the ball — they **predict** it from the pitcher's kinematics and the first few tens of milliseconds of flight, and commit to a swing before the visual evidence arrives.
 
 The pedagogical point: a forward model is not a luxury feature bolted onto perception. It is what makes control possible at all when sensing is slower than the world. The same argument transfers directly to a robot with a 30 Hz camera, 100 ms inference latency, and contact events that resolve in 10 ms.
 
