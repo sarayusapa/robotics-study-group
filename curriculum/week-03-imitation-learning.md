@@ -1,78 +1,110 @@
-# Week 03 — Imitation Learning
+# Imitation Learning
 
-[← Control and MDPs](week-02-control-and-mdps.md) · **Week 3 of 11** · [Next: Reinforcement Learning I →](week-04-reinforcement-learning-i.md)
 
-## Complete lecture deck
+prerequire
 
-{% include slide-deck.html week="03" count=45 title="Lecture 3: Imitation Learning" %}
+notations of imitation learning or intellegent systems or learning systems in general
 
-## Outcomes
+at - action 
+ot - observations
+st - stae
 
-- Explain why supervised accuracy is insufficient for closed-loop imitation.
-- Compare behavior cloning, DAgger, and sequence/action-chunking policies.
-- Diagnose covariate shift and causal confusion.
+t - trajectory
 
-![Behavior cloning and DAgger comparison](../assets/diagrams/week-03-dagger.svg)
+r(s,a) - reward
 
-## Quick reference
 
-| Method | Data collection | Strength | Main limitation |
-| --- | --- | --- | --- |
-| Behavior cloning | Expert trajectories once | Simple and stable | Learner-state shift |
-| DAgger | Iterative learner rollouts + expert relabeling | Recovery-state coverage | Requires repeated expert access |
-| Action chunking | Demonstrations with sequence targets | Temporal coherence | Slower feedback for long chunks |
-| Generative policy | Demonstrations with multimodal targets | Represents alternatives | More complex inference |
+example ??
 
-## Core notes
 
-Behavior cloning fits a policy to expert observation-action pairs. It is simple and stable, but the learned policy changes which states it visits. Small errors move the robot away from the demonstration distribution; unfamiliar states cause more errors, and mistakes compound over the horizon.
+imitation learning: given set of traejcotries collected by an "expert" called as "demonstration"
 
-DAgger addresses this by rolling out the learner, querying the expert on states the learner actually visits, aggregating those labels, and retraining. It trades expert effort for better coverage of recovery states. When online relabeling is impossible, dataset diversity, perturbation/recovery demonstrations, conservative deployment, and uncertainty-aware fallback become important.
+D = {(s1,a1,....,st)}
 
-Robotic behavior is often multimodal: several actions can be correct in the same observation. A mean-squared-error policy may average them into an invalid action. Discrete bins, mixture models, energy-based models, diffusion policies, or action chunks can represent alternatives. Chunking also reduces the effective decision horizon, but long chunks reduce feedback frequency.
 
-Causal confusion appears when a policy uses a correlate that predicts expert actions in the dataset but does not cause success. Evaluate under interventions: change backgrounds, object arrangements, demonstrator artifacts, or history while holding the task fixed.
 
-## Objectives and compounding error
+the goal is to learn a policy Pi that imitates the expert behaviour
 
-Behavior cloning minimizes supervised negative log-likelihood:
 
-> `L_BC(θ) = - E_(o,a)~D [log πθ(a│o)]`
 
-This expectation is over the expert dataset, while deployment observations come from the learner-induced distribution. A small per-step mistake probability can therefore produce a much larger trajectory-level failure rate over a long horizon.
+i.e beheaviour cloning
 
-DAgger closes the loop:
+given D={(s1,a1....st)}
 
-1. Train on the current aggregated dataset.
-2. Roll out the learner, optionally mixed with the expert for safety.
-3. Ask the expert what action should have been taken at visited states.
-4. Add those pairs to the dataset and repeat.
+for dtereministic policy regress to expert actions
 
-## Dataset and architecture decisions
+mintheta 1/|d| sigma(s,a)bnelongsD||a-a||^2 where a=pi0(s)
 
-- Store observation timestamps, action timestamps, control frequency, and episode boundaries.
-- Split by trajectory or scene—not individual frames—to avoid leakage.
-- Normalize actions with training-set statistics and record the inverse transform.
-- Choose whether the policy sees a frame, stacked frames, or recurrent history.
-- For visual policies, compare frozen pretrained features with end-to-end training.
+deploy policy p0 on the robot
 
-## Failure modes
 
-- Validation loss falls while closed-loop success collapses.
-- Mean regression averages two valid modes into an invalid motion.
-- The policy keys on gripper state, background, or demonstrator artifacts.
-- Demonstrations show success paths but no recovery behavior.
+does it work?
 
-## Paper discussion
+cite end ot end learning for selfd dsirivng cars bojarski et all 2016
 
-Contrast the diagnosis in [Causal Confusion in Imitation Learning](https://arxiv.org/abs/1905.11979) with the empirical case for pretrained visual representations in [Pari et al.](https://arxiv.org/abs/2112.01511).
 
-## Build milestone
 
-Collect or synthesize demonstrations, train behavior cloning, then introduce initial-state noise. Add either DAgger or recovery data and compare closed-loop success—not just validation loss—over three seeds.
+add fake data that illustrates correction with side facing cameras 
 
-Plot performance against perturbation magnitude and dataset size. Include the expert, a random policy, and behavior cloning before claiming the interactive method helps.
 
----
+"data augmenetation"
 
-[← Control and MDPs](week-02-control-and-mdps.md) · [Next: Reinforcement Learning I →](week-04-reinforcement-learning-i.md)
+
+
+the upper bound of beuhaviour cloning 
+
+add the figurte of actiona nbd state drift
+for time horizon T
+
+
+districvtubion shift causes the error to grow quadratically
+
+"a reduction of iomiation learning and structured prediction to no regret online learning" by ross el all 2011
+
+
+addressing compounding error
+
+how can we make p(expert) = ppi(s)
+
+states visited expert  = staes visited by the policy
+
+ 
+flow of how dagger works 
+
+rollout pi0 -> quer label expert action at visited states a* -> aggregate coorectio with exeisting data D<-DU{(s`,a*)}
+update policy <- arg min L{pi0, D}
+
+
+
+
+
+
+
+goods
+lets the human take the control, the true expert
+paradox bc works better if the data has more mistakes nad recoeries
+hence algho with converge pi(s) = p expert
+achives O(t) instead of BC 0(<AT^2)
+
+
+bads
+how to detect when anintervention is needed
+hindsight laberlling and expertt query difficuilt this is not ideal
+
+
+
+
+
+exmaple waymo self driving
+
+
+why mght we still fail to mimick the exeprt
+
+action depends only on current observation, human bejhaviour mightbe afffected by past observertions, emotions aand privileged informatione tc
+
+
+
+
+also human obs != robot caerma observation
+
+
